@@ -305,7 +305,7 @@ namespace opponent {
         Node n; n.a = O; n.d = 0; //n.x.clear();
         //if(!n.x.empty()) std::cout << "woah";
         do simulate(b, &n);
-        while((clock() - time) < 10000);
+        while((clock() - time) < 100000);
         treeWalk(&n, 0);
         int move = selectNode(&n)->move;
         destroyTree(&n);
