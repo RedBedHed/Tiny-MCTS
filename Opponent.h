@@ -187,8 +187,8 @@ namespace opponent {
 
     inline void simulate
         (
-        Board * const b,
-        Node  * const n
+        Board * const b,/* The board.                                   */
+        Node  * const n /* The root node.                               */
         )
     {
         Node* x   = n;
