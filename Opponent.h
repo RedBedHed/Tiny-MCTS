@@ -185,7 +185,7 @@ namespace opponent {
         }
     }
 
-    void simulate
+    inline void simulate
         (
         Board * const b,
         Node  * const n
@@ -283,7 +283,7 @@ namespace opponent {
         x->v += winX;
     }
 
-    void treeWalk(Node* n, int depth)
+    inline void treeWalk(Node* n, int depth)
     {
         for(Node* x: n->x)
         {
@@ -294,7 +294,7 @@ namespace opponent {
         }
     }
 
-    void destroyTree(Node* n)
+    inline void destroyTree(Node* n)
     {
         for(Node* const x: n->x)
         { destroyTree(x); delete x; }
