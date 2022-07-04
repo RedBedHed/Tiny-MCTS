@@ -20,7 +20,7 @@ namespace opponent {
     using std::vector;
     using std::stack;
 
-    inline double UCB1
+    constexpr double UCB1
         (
         const int vi, /* The Q value of the node.                       */
         const int n,  /* The number of simulations run under the parent */
@@ -55,7 +55,7 @@ namespace opponent {
          * (applied to trees)
          * Policy.
          */
-        Node* s;
+        Node* s = nullptr;
         double m = -1;
         for(Node* const x: n->x)
         {
