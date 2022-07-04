@@ -78,7 +78,7 @@ namespace opponent {
     {
         /*
          * Roll out a single
-         * Monte-Carlo simulation.
+         * random line of play.
          */
         while
             (
@@ -108,8 +108,7 @@ namespace opponent {
     {
         /*
          * Clean up after a
-         * single Monte-Carlo
-         * simulation.
+         * single rollout.
          */
         while (!s.empty())
         {
@@ -141,8 +140,7 @@ namespace opponent {
          * good samples.
          * Collect a sample
          * now via a single
-         * Monte-Carlo
-         * simulation.
+         * rollout.
          */
         if(x->n < 30)
         {
@@ -159,7 +157,7 @@ namespace opponent {
          * that this node
          * is worth expanding.
          * Expand the node
-         * and run Monte-Carlo
+         * and rollout random
          * simulations from
          * each of its children.
          */
@@ -237,16 +235,12 @@ namespace opponent {
             if(x->x.empty())
             {
                 /**
-                 * Rollout
-                 * Monte-Carlo
-                 * simulation(s)
-                 * according to
-                 * a random
-                 * Default Policy.
-                 * Expand the
-                 * current node
-                 * if it is
-                 * promising.
+                 * Rollout lines of
+                 * play according to
+                 * a random Default
+                 * Policy. Expand
+                 * the current node
+                 * if it is promising.
                  */
                 rollout
                 (
