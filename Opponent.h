@@ -219,6 +219,7 @@ namespace opponent {
             );
             x->n += total;
             x->v += winO;
+            return;
         }
         /**
          * (1) Navigate the MC
