@@ -37,7 +37,6 @@ int main() {
             if(b.isFull()) break;
             const long start = clock();
             const int m = opponent::search(&b);
-            std::cout << m << '\n';
             b.mark<X>(m);
             const long end = clock() - start;
             cout << "\033[2J\033[H" << flush;

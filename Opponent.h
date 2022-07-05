@@ -199,13 +199,22 @@ namespace opponent {
             winO  = 0,
             total = 0;
 
+        /**
+         * If initializing the
+         * root node, expand
+         * it's children in
+         * the rollout step
+         * and update the
+         * root.
+         */
         if constexpr (INIT)
         {
             rollout<INIT>
             (
             b, winX, winO, total, x
             );
-            goto back_propagate;
+            x->n += total;
+            x->v += winO;
         }
         /**
          * (1) Navigate the MC
@@ -279,7 +288,6 @@ namespace opponent {
          * and update all nodes
          * on the path.
          */
-        back_propagate:
         while(x != n)
         {
             x->n += total;
@@ -292,15 +300,19 @@ namespace opponent {
         x->v += winO;
     }
 
-    inline void treeWalk(Node* n, int depth)
+    inline int treeWalk(Node* n, int depth)
     {
+        if(n->x.empty())
+            return 1;
+        int c = 0;
         for(Node* x: n->x)
         {
             for(int i = 0; i < depth; ++i)
             { std::cout << '\t'; }
             std::cout << x->move << ": " << x->v << '/' << x->n << '\n';
-            treeWalk(x, depth + 1);
+            c += treeWalk(x, depth + 1);
         }
+        return c + 1;
     }
 
     inline void destroyTree(Node* n)
@@ -311,12 +323,12 @@ namespace opponent {
 
     inline int search(Board * const b) {
         clock_t const time = clock();
-        Node n; n.a = O; n.d = 0; //n.x.clear();
-        //if(!n.x.empty()) std::cout << "woah";
+        Node n; n.a = O; n.d = 0;
         simulate<true>(b, &n);
         do simulate<false>(b, &n);
         while((clock() - time) < 100000);
-        treeWalk(&n, 0);
+        int i = treeWalk(&n, 0);
+        std::cout << "Node Count:" << i << '\n';
         int move = selectNode(&n)->move;
         destroyTree(&n);
         return move;
