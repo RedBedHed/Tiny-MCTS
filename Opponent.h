@@ -199,7 +199,7 @@ namespace opponent {
             winO  = 0,
             total = 0;
 
-        if(INIT)
+        if constexpr (INIT)
         {
             rollout<INIT>
             (
