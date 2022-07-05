@@ -22,7 +22,7 @@ namespace opponent {
 
     constexpr double UCB1
         (
-        const int vi, /* The Q value of the node.                       */
+        const int vi, /* The MC value of the node.                      */
         const int n,  /* The number of simulations run under the parent */
         const int ni  /* The number of simulations run under the node   */
         )
@@ -118,6 +118,7 @@ namespace opponent {
         }
     }
 
+    template<bool INIT>
     inline void rollout
         (
         Board* const b, /* The board.                                   */
@@ -142,7 +143,9 @@ namespace opponent {
          * now via a single
          * rollout.
          */
-        if(x->n < 30)
+        if constexpr (INIT)
+            goto expand;
+        if (x->n < 30)
         {
             a = ~x->a;
             rolldwn(b, a, c, o, s);
@@ -161,6 +164,7 @@ namespace opponent {
          * simulations from
          * each of its children.
          */
+        expand:
         for (int i = 0; i < 9; ++i)
         {
             if (b->occupiedSquare(i))
@@ -183,6 +187,7 @@ namespace opponent {
         }
     }
 
+    template<bool INIT>
     inline void simulate
         (
         Board * const b,/* The board.                                   */
@@ -193,8 +198,17 @@ namespace opponent {
         int winX  = 0,
             winO  = 0,
             total = 0;
+
+        if(INIT)
+        {
+            rollout<INIT>
+            (
+            b, winX, winO, total, x
+            );
+            goto back_propagate;
+        }
         /**
-         * Navigate the MC
+         * (1) Navigate the MC
          * Tree.
          */
         for(;;)
@@ -235,14 +249,14 @@ namespace opponent {
             if(x->x.empty())
             {
                 /**
-                 * Rollout lines of
-                 * play according to
-                 * a random Default
+                 * (2) Rollout lines
+                 * of play according
+                 * to a random Default
                  * Policy. Expand
                  * the current node
                  * if it is promising.
                  */
-                rollout
+                rollout<INIT>
                 (
                 b, winX, winO, total, x
                 );
@@ -261,10 +275,11 @@ namespace opponent {
             b->mark(x->a, x->move);
         }
         /**
-         * Back-up to the root
+         * (3) return to the root
          * and update all nodes
-         * encountered.
+         * on the path.
          */
+        back_propagate:
         while(x != n)
         {
             x->n += total;
@@ -274,7 +289,7 @@ namespace opponent {
             x = x->parent;
         }
         x->n += total;
-        x->v += winX;
+        x->v += winO;
     }
 
     inline void treeWalk(Node* n, int depth)
@@ -298,7 +313,8 @@ namespace opponent {
         clock_t const time = clock();
         Node n; n.a = O; n.d = 0; //n.x.clear();
         //if(!n.x.empty()) std::cout << "woah";
-        do simulate(b, &n);
+        simulate<true>(b, &n);
+        do simulate<false>(b, &n);
         while((clock() - time) < 100000);
         treeWalk(&n, 0);
         int move = selectNode(&n)->move;
