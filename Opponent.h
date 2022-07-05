@@ -134,6 +134,14 @@ namespace opponent {
         int         c, o;
         total = 0;
         c = o = 0;
+        /*
+         * If this is an
+         * initialization
+         * rollout, expand
+         * the node.
+         */
+        if constexpr (INIT)
+            goto expand;
         /**
          * Don't expand
          * the current node
@@ -143,8 +151,6 @@ namespace opponent {
          * now via a single
          * rollout.
          */
-        if constexpr (INIT)
-            goto expand;
         if (x->n < 30)
         {
             a = ~x->a;
@@ -198,12 +204,10 @@ namespace opponent {
         int winX  = 0,
             winO  = 0,
             total = 0;
-
         /**
          * If initializing the
          * root node, expand
-         * it's children in
-         * the rollout step
+         * in the rollout step
          * and update the
          * root.
          */
