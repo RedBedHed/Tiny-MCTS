@@ -143,6 +143,7 @@ namespace opponent {
         if constexpr (INIT)
             goto expand;
         /**
+         * (3) Simulation.
          * Don't expand
          * the current node
          * until we get 30
@@ -162,13 +163,16 @@ namespace opponent {
             return;
         }
         /**
-         * We now have evidence
-         * that this node
-         * is worth expanding.
-         * Expand the node
-         * and rollout random
-         * simulations from
-         * each of its children.
+         * (2) Expansion.
+         * (3) Simulation.
+         * We now have
+         * evidence that this
+         * node is worth
+         * expanding. Expand
+         * the node and rollout
+         * random simulations
+         * from each of its
+         * children.
          */
         expand:
         for (int i = 0; i < 9; ++i)
@@ -222,7 +226,7 @@ namespace opponent {
             return;
         }
         /**
-         * (1) Navigate the MC
+         * Navigate the MC
          * Tree.
          */
         for(;;)
@@ -263,7 +267,7 @@ namespace opponent {
             if(x->x.empty())
             {
                 /**
-                 * (2) Rollout lines
+                 * Rollout lines
                  * of play according
                  * to a random Default
                  * Policy. Expand
@@ -277,6 +281,7 @@ namespace opponent {
                 break;
             }
             /**
+             * (1) Selection.
              * Select a node
              * according to
              * the UC Tree
@@ -289,7 +294,8 @@ namespace opponent {
             b->mark(x->a, x->move);
         }
         /**
-         * (3) return to the root
+         * (4) Back-propagation.
+         * return to the root
          * and update all nodes
          * on the path.
          */
