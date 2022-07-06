@@ -159,10 +159,11 @@ namespace opponent {
          * children.
          */
         expand:
-        for (int i = 0; i < 9; ++i)
+        uint16_t bb = b->legalMoves();
+        for (; bb; bb &= bb - 1)
         {
-            if (b->occupiedSquare(i))
-                continue;
+            const int i =
+            8 - bit::bitScanFwd(bb);
             l = new Node();
             l->a = ~x->a;
             l->parent = x;

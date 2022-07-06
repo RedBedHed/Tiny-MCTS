@@ -220,6 +220,18 @@ namespace bit {
         occupiedSquare(const int i) const
         { ASSERTI; return SQUARE_FULL(i); }
 
+        /**
+         * A function to get the bitboard layer
+         * of the given alliance.
+         *
+         * @tparam A the alliance
+         * @return the bitboard layer of the
+         * given alliance
+         */
+        [[nodiscard]]
+        constexpr uint16_t legalMoves() const
+        { return (~FULL_BOARD) & 0x01FFU; }
+
 #       undef SQUARE_FULL
 #       undef ASSERTTI
 #       undef ASSERTI
