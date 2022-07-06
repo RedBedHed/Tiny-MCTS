@@ -157,14 +157,12 @@ namespace opponent {
                 if(b->hasVictory<X>())
                 {
                     ++winX;
-
                     ++total;
                     break;
                 }
                 if(b->hasVictory<O>())
                 {
                     ++winO;
-
                     ++total;
                     break;
                 }
@@ -206,20 +204,18 @@ namespace opponent {
             {
                 if(b->hasVictory<X>())
                 {
-                    winX += 1;
+                    ++winX;
                     if(l->a == X)
-                        l->v += 1;
-                    l->n = 1;
-                    ++total;
+                        ++l->v;
+                    total += l->n = 1;
                     break;
                 }
                 if(b->hasVictory<O>())
                 {
-                    winO += 1;
+                    ++winO;
                     if(l->a == O)
-                        l->v += 1;
-                    l->n = 1;
-                    ++total;
+                        ++l->v;
+                    total += l->n = 1;
                     break;
                 }
                 if(b->isFull())
