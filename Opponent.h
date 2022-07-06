@@ -101,8 +101,6 @@ namespace opponent {
         (
         Board* const b, /* The board.                                   */
         Alliance& a,    /* The starting alliance.                       */
-        int& c,         /* The crosses count.                           */
-        int& o,         /* The o's count.                               */
         stack<int>& s   /* The rollout stack.                           */
         )
     {
@@ -154,12 +152,32 @@ namespace opponent {
          */
         if (x->n < 30)
         {
-            a = ~x->a;
-            rolldwn(b, a, c, o, s);
-            if(c) ++winX;
-            if(o) ++winO;
-            ++total;
-            rollup(b, a, c, o, s);
+            for(a = ~x->a ;; a = ~a)
+            {
+                if(b->hasVictory<X>())
+                {
+                    ++winX;
+
+                    ++total;
+                    break;
+                }
+                if(b->hasVictory<O>())
+                {
+                    ++winO;
+
+                    ++total;
+                    break;
+                }
+                if(b->isFull())
+                    break;
+                int m;
+                do m = rand() % 9;
+                while
+                (b->occupiedSquare(m));
+                b->mark(a, m);
+                s.push(m);
+            }
+            rollup(b, a, s);
             return;
         }
         /**
@@ -184,14 +202,36 @@ namespace opponent {
             l->parent = x;
             l->move = i;
             b->mark(l->a, l->move);
-            a = x->a;
-            rolldwn(b, a, c, o, s);
-            if(c) winX += c = 1;
-            if(o) winO += o = 1;
-            l->n = 1;
-            l->v += l->a == X? c: o;
-            ++total;
-            rollup(b, a, c, o, s);
+            for(a = x->a ;; a = ~a)
+            {
+                if(b->hasVictory<X>())
+                {
+                    winX += 1;
+                    if(l->a == X)
+                        l->v += 1;
+                    l->n = 1;
+                    ++total;
+                    break;
+                }
+                if(b->hasVictory<O>())
+                {
+                    winO += 1;
+                    if(l->a == O)
+                        l->v += 1;
+                    l->n = 1;
+                    ++total;
+                    break;
+                }
+                if(b->isFull())
+                    break;
+                int m;
+                do m = rand() % 9;
+                while
+                (b->occupiedSquare(m));
+                b->mark(a, m);
+                s.push(m);
+            }
+            rollup(b, a, s);
             b->mark(l->a, l->move);
             x->x.push_back(l);
         }
