@@ -242,23 +242,18 @@ namespace opponent {
              * its direction.
              */
             if(b->hasVictory<X>())
-                winX = 1;
-            if(b->hasVictory<O>())
-                winO = 1;
-            total = b->isFull()?
-                0: 1;
-            if(winX || winO || !total)
             {
-                /**
-                 * Only set the total
-                 * simulations
-                 * to one if there is
-                 * a victory. Ties
-                 * don't count.
-                 */
-                total = winX | winO;
+                winX = total = 1;
                 break;
             }
+            if(b->hasVictory<O>())
+            {
+                winO = total = 1;
+                break;
+            }
+            if(b->isFull())
+                break;
+
             /*
              * If we reach a
              * node without
