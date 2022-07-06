@@ -67,36 +67,6 @@ namespace opponent {
         return s;
     }
 
-    inline void rolldwn
-        (
-        Board* const b, /* The board.                                   */
-        Alliance& a,    /* The starting alliance.                       */
-        int& c,         /* The crosses count.                           */
-        int& o,         /* The o's count.                               */
-        stack<int>& s   /* The rollout stack.                           */
-        )
-    {
-        /*
-         * Roll out a single
-         * random line of play.
-         */
-        while
-            (
-        ! ((c = b->hasVictory<X>())
-        || (o = b->hasVictory<O>())
-        || b->isFull())
-            )
-        {
-            int m;
-            do m = rand() % 9;
-            while
-            (b->occupiedSquare(m));
-            b->mark(a, m);
-            s.push(m);
-            a = ~a;
-        }
-    }
-
     inline void rollup
         (
         Board* const b, /* The board.                                   */
@@ -129,9 +99,7 @@ namespace opponent {
         Alliance    a;
         Node*       l;
         stack<int>  s;
-        int         c, o;
         total = 0;
-        c = o = 0;
         /*
          * If this is an
          * initialization
