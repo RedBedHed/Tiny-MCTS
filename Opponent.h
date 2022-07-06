@@ -159,7 +159,8 @@ namespace opponent {
          * children.
          */
         expand:
-        uint16_t bb = b->legalMoves();
+        uint16_t
+        bb = b->legalMoves();
         for (; bb; bb &= bb - 1)
         {
             const int i =
