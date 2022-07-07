@@ -112,13 +112,13 @@ namespace opponent {
          * (3) Simulation.
          * Don't expand
          * the current node
-         * until we get 60
+         * until we get 30
          * good samples.
          * Collect a sample
          * now via a single
          * rollout.
          */
-        if (x->n < 60)
+        if (x->n < 30)
         {
             for(a = ~x->a ;; a = ~a)
             {
