@@ -125,15 +125,14 @@ namespace opponent {
                 if(b->hasVictory<X>())
                 {
                     ++winX;
-                    ++total;
                     break;
                 }
                 if(b->hasVictory<O>())
                 {
                     ++winO;
-                    ++total;
                     break;
                 }
+                ++total;
                 if(b->isFull())
                     break;
                 int m;
@@ -175,20 +174,19 @@ namespace opponent {
                 {
                     ++winX;
                     if(l->a == X)
-                        ++l->v;
-                    total += l->n = 1;
+                        l->v = 1;
                     break;
                 }
                 if(b->hasVictory<O>())
                 {
                     ++winO;
                     if(l->a == O)
-                        ++l->v;
-                    total += l->n = 1;
+                        l->v = 1;
                     break;
                 }
                 if(b->isFull())
                     break;
+                total += l->n = 1;
                 int m;
                 do m = rand() % 9;
                 while
