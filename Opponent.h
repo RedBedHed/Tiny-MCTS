@@ -163,12 +163,11 @@ namespace opponent {
         bb = b->legalMoves();
         for (; bb; bb &= bb - 1)
         {
-            const int i =
-            8 - bit::bitScanFwd(bb);
             l = new Node();
             l->a = ~x->a;
             l->parent = x;
-            l->move = i;
+            l->move =
+            8 - bit::bitScanFwd(bb);
             b->mark(l->a, l->move);
             for(a = x->a ;; a = ~a)
             {
