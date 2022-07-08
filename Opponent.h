@@ -138,7 +138,7 @@ namespace opponent {
                     ++winO;
                     break;
                 }
-                ++total;
+                total += 2;
                 int m;
                 do m = rand() % 9;
                 while
@@ -195,7 +195,7 @@ namespace opponent {
                     l->v = 1;
                     break;
                 }
-                total += l->n = 1;
+                total += l->n = 2;
                 int m;
                 do m = rand() % 9;
                 while
@@ -256,19 +256,19 @@ namespace opponent {
             if(b->hasVictory<X>())
             {
                 winX = 2;
-                total = 1;
+                total = 2;
                 break;
             }
             if(b->hasVictory<O>())
             {
                 winO = 2;
-                total = 1;
+                total = 2;
                 break;
             }
             if(b->isFull()) {
                 ++winX;
                 ++winO;
-                total = 1;
+                total = 2;
                 break;
             }
 
