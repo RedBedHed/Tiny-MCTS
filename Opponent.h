@@ -132,9 +132,9 @@ namespace opponent {
                     ++winO;
                     break;
                 }
-                ++total;
                 if(b->isFull())
                     break;
+                ++total;
                 int m;
                 do m = rand() % 9;
                 while
