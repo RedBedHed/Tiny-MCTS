@@ -86,6 +86,24 @@ namespace opponent {
         }
     }
 
+    inline void randMove
+        (
+        Board* const b, /* The board.                                   */
+        Alliance& a,    /* The starting alliance.                       */
+        stack<int>& s   /* The rollout stack.                           */
+        )
+    {
+        /*
+         * Make a random move.
+         */
+        int m;
+        do m = rand() % 9;
+        while
+        (b->occupiedSquare(m));
+        b->mark(a, m);
+        s.push(m);
+    }
+
     template<bool INIT>
     inline void rollout
         (
@@ -139,12 +157,7 @@ namespace opponent {
                     break;
                 }
                 total += 2;
-                int m;
-                do m = rand() % 9;
-                while
-                (b->occupiedSquare(m));
-                b->mark(a, m);
-                s.push(m);
+                randMove(b, a, s);
             }
             rollup(b, a, s);
             return;
@@ -196,12 +209,7 @@ namespace opponent {
                     break;
                 }
                 total += l->n = 2;
-                int m;
-                do m = rand() % 9;
-                while
-                (b->occupiedSquare(m));
-                b->mark(a, m);
-                s.push(m);
+                randMove(b, a, s);
             }
             rollup(b, a, s);
             b->mark(l->a, l->move);
