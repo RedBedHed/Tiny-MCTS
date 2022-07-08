@@ -256,22 +256,20 @@ namespace opponent {
             if(b->hasVictory<X>())
             {
                 winX = 2;
-                total = 2;
+
                 break;
             }
             if(b->hasVictory<O>())
             {
                 winO = 2;
-                total = 2;
                 break;
             }
             if(b->isFull()) {
                 ++winX;
                 ++winO;
-                total = 2;
                 break;
             }
-
+            total = 2;
             /*
              * If we reach a
              * node without
