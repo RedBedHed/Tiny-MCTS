@@ -124,16 +124,20 @@ namespace opponent {
             {
                 if(b->hasVictory<X>())
                 {
-                    ++winX;
+                    winX += 2;
                     break;
                 }
                 if(b->hasVictory<O>())
                 {
-                    ++winO;
+                    winO += 2;
                     break;
                 }
                 if(b->isFull())
+                {
+                    ++winX;
+                    ++winO;
                     break;
+                }
                 ++total;
                 int m;
                 do m = rand() % 9;
@@ -172,20 +176,25 @@ namespace opponent {
             {
                 if(b->hasVictory<X>())
                 {
-                    ++winX;
+                    winX += 2;
                     if(l->a == X)
-                        l->v = 1;
+                        l->v = 2;
                     break;
                 }
                 if(b->hasVictory<O>())
                 {
-                    ++winO;
+                    winO += 2;
                     if(l->a == O)
-                        l->v = 1;
+                        l->v = 2;
                     break;
                 }
                 if(b->isFull())
+                {
+                    ++winO;
+                    ++winX;
+                    l->v = 1;
                     break;
+                }
                 total += l->n = 1;
                 int m;
                 do m = rand() % 9;
@@ -246,16 +255,22 @@ namespace opponent {
              */
             if(b->hasVictory<X>())
             {
-                winX = total = 1;
+                winX = 2;
+                total = 1;
                 break;
             }
             if(b->hasVictory<O>())
             {
-                winO = total = 1;
+                winO = 2;
+                total = 1;
                 break;
             }
-            if(b->isFull())
+            if(b->isFull()) {
+                ++winX;
+                ++winO;
+                total = 1;
                 break;
+            }
 
             /*
              * If we reach a
