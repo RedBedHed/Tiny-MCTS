@@ -263,7 +263,8 @@ namespace opponent {
                 winO = 2;
                 break;
             }
-            if(b->isFull()) {
+            if(b->isFull())
+            {
                 ++winX;
                 ++winO;
                 break;
