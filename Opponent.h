@@ -256,7 +256,6 @@ namespace opponent {
             if(b->hasVictory<X>())
             {
                 winX = 2;
-
                 break;
             }
             if(b->hasVictory<O>())
