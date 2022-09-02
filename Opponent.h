@@ -146,8 +146,7 @@ namespace opponent {
                     { winO = 1.0; break; }
                 if(b->isFull())
                 {
-                    winX = 0.5;
-                    winO = 0.5;
+                    winX = winO = 0.5;
                     break;
                 }
                 total += 1.0;
