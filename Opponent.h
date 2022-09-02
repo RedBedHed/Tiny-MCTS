@@ -138,10 +138,12 @@ namespace opponent {
         {
             for(a = ~x->a ;; a = ~a)
             {
-                if(b->hasVictory<X>())
-                { winX = 1.0; break; }
-                if(b->hasVictory<O>())
-                { winO = 1.0; break; }
+                if(a == X) {
+                    if(b->hasVictory<X>())
+                    { winX = 1.0; break; }
+                } else
+                    if(b->hasVictory<O>())
+                    { winO = 1.0; break; }
                 if(b->isFull())
                 {
                     winX = 0.5;
