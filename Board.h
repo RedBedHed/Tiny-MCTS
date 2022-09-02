@@ -177,7 +177,7 @@ namespace bit {
         */
         template<Alliance A>
         constexpr void mark(const int i)
-        { if(i < 0 || i > 8) std::cout << "aha " << i << '\n'; ASSERTTA; ASSERTI; PLACE_MARK(A, i); }
+        { ASSERTTA; ASSERTI; PLACE_MARK(A, i); }
 
         /**
         * A function to make or unmake a mark
@@ -290,17 +290,17 @@ namespace bit {
         constexpr void reset()
         { bbx = bbo = 0; }
 
-        inline void legalMoves(std::vector<Node*>& v, Alliance A, Node* p) {
-            const uint64_t bb = (~(bbx | bbo)) & BoardMask;
-            for(uint64_t b = bb; b; b &= b - 1) {
-                Node* n = new Node();
-                n->a = A;
-                n->parent = p;
-                if(p != nullptr) n->d = p->d + 1;
-                n->move = bitScanFwd(b);
-                v.push_back(n);
-            }
-        }
+        // inline void legalMoves(std::vector<Node*>& v, Alliance A, Node* p) {
+        //     const uint64_t bb = (~(bbx | bbo)) & BoardMask;
+        //     for(uint64_t b = bb; b; b &= b - 1) {
+        //         Node* n = new Node();
+        //         n->a = A;
+        //         n->parent = p;
+        //         if(p != nullptr) n->d = p->d + 1;
+        //         n->move = bitScanFwd(b);
+        //         v.push_back(n);
+        //     }
+        // }
 
         /**
          * Insertion overload.

@@ -17,12 +17,22 @@ namespace bit {
 
     struct Node final {
         int move = -1;
-        int v = 0;
-        int n = 0;
-        int d = 0;
+        double v = 0;
+        double n = 0;
+        double d = 0;
         Alliance a = X;
         Node *parent = nullptr;
-        std::vector<Node *> x;
+        std::vector<Node *> x; 
+        // Not space efficient, 
+        // but who really cares?
+        inline Node(
+        const int m, 
+        const Alliance a, 
+        Node* const p) : 
+        move(m), 
+        a(a), 
+        parent(p) { }
     };
 }
+
 #endif //UNTITLED3_NODE_H

@@ -22,22 +22,16 @@ namespace opponent {
 
     constexpr double UCB1
         (
-        const int vi, /* The MC value of the node.                      */
-        const int n,  /* The number of simulations run under the parent */
-        const int ni  /* The number of simulations run under the node   */
+        const double vi, /* The MC value of the node.                      */
+        const double n,  /* The number of simulations run under the parent */
+        const double ni  /* The number of simulations run under the node   */
         )
     {
-        if(ni <= 0)
-            return DBL_MAX;
-        return
-            ((double) vi /
-             (double) ni) +
+        return 
+            (ni <= 0)? DBL_MAX :
+            (vi / ni) +
             1.42 * std::sqrt
-            (
-            (double)
-            std::log(n) /
-            (double) ni
-            );
+            (std::log(n) / ni);
     }
 
     inline Node* selectNode
@@ -94,7 +88,9 @@ namespace opponent {
         )
     {
         /*
-         * Make a random move.
+         * Make a random move. 
+         * This is inefficient. 
+         * Do better.
          */
         int m;
         do m = rand() % 9;
@@ -108,9 +104,9 @@ namespace opponent {
     inline void rollout
         (
         Board* const b, /* The board.                                   */
-        int& winX,      /* The win count of x.                          */
-        int& winO,      /* The win count of o.                          */
-        int& total,     /* The total number of simulations.             */
+        double& winX,   /* The win count of x.                          */
+        double& winO,   /* The win count of o.                          */
+        double& total,  /* The total number of simulations.             */
         Node* const x   /* The leaf tree node selected by tree policy   */
         )
     {
@@ -118,6 +114,7 @@ namespace opponent {
         Node*       l;
         stack<int>  s;
         total = 0;
+
         /*
          * If this is an
          * initialization
@@ -126,6 +123,7 @@ namespace opponent {
          */
         if constexpr (INIT)
             goto expand;
+
         /**
          * (3) Simulation.
          * Don't expand
@@ -141,27 +139,22 @@ namespace opponent {
             for(a = ~x->a ;; a = ~a)
             {
                 if(b->hasVictory<X>())
-                {
-                    winX += 2;
-                    break;
-                }
+                { winX = 1.0; break; }
                 if(b->hasVictory<O>())
-                {
-                    winO += 2;
-                    break;
-                }
+                { winO = 1.0; break; }
                 if(b->isFull())
                 {
-                    ++winX;
-                    ++winO;
+                    winX = 0.5;
+                    winO = 0.5;
                     break;
                 }
-                total += 2;
+                total += 1.0;
                 randMove(b, a, s);
             }
             rollup(b, a, s);
             return;
         }
+
         /**
          * (2) Expansion.
          * (3) Simulation.
@@ -179,36 +172,37 @@ namespace opponent {
         bb = b->legalMoves();
         for (; bb; bb &= bb - 1)
         {
-            l = new Node();
-            l->a = ~x->a;
-            l->parent = x;
-            l->move =
-            8 - bit::bitScanFwd(bb);
+            l = new Node
+            (
+                8 - bit::bitScanFwd(bb), 
+                ~x->a, x
+            );
             b->mark(l->a, l->move);
             for(a = x->a ;; a = ~a)
             {
-                if(b->hasVictory<X>())
+                if(l->a == X) 
                 {
-                    winX += 2;
-                    if(l->a == X)
-                        l->v = 2;
-                    break;
-                }
-                if(b->hasVictory<O>())
-                {
-                    winO += 2;
-                    if(l->a == O)
-                        l->v = 2;
-                    break;
-                }
+                    if(b->hasVictory<X>())
+                    {
+                        winX += 1.0;
+                        l->v = 1.0;
+                        break;
+                    }
+                } else 
+                    if(b->hasVictory<O>())
+                    {
+                        winO += 1.0;
+                        l->v = 1.0;
+                        break;
+                    }
                 if(b->isFull())
                 {
-                    ++winO;
-                    ++winX;
-                    l->v = 1;
+                    winO += 0.5;
+                    winX += 0.5;
+                    l->v = 0.5;
                     break;
                 }
-                total += l->n = 2;
+                total += l->n = 1.0;
                 randMove(b, a, s);
             }
             rollup(b, a, s);
@@ -225,9 +219,10 @@ namespace opponent {
         )
     {
         Node* x   = n;
-        int winX  = 0,
-            winO  = 0,
-            total = 0;
+        double winX  = 0,
+               winO  = 0,
+               total = 0;
+
         /**
          * If initializing the
          * root node, expand
@@ -245,12 +240,14 @@ namespace opponent {
             x->v += winO;
             return;
         }
+
         /**
          * Navigate the MC
          * Tree.
          */
         for(;;)
         {
+
             /*
              * Check if the
              * current node
@@ -261,23 +258,21 @@ namespace opponent {
              * search in
              * its direction.
              */
-            if(b->hasVictory<X>())
+            if(x->a == X) 
             {
-                winX = 2;
-                break;
+                if(b->hasVictory<X>())
+                { winX = total = 1.0; break; }
             }
-            if(b->hasVictory<O>())
-            {
-                winO = 2;
-                break;
-            }
+            else 
+                if(b->hasVictory<O>())
+                { winO = total = 1.0; break; }
             if(b->isFull())
-            {
-                ++winX;
-                ++winO;
-                break;
+            { 
+                winX = winO = 0.5; 
+                total = 1.0; break; 
             }
-            total = 2;
+            
+
             /*
              * If we reach a
              * node without
@@ -294,11 +289,10 @@ namespace opponent {
                  * if it is promising.
                  */
                 rollout<INIT>
-                (
-                b, winX, winO, total, x
-                );
+                (b, winX, winO, total, x);
                 break;
             }
+
             /**
              * (1) Selection.
              * Select a node
@@ -312,6 +306,7 @@ namespace opponent {
              */
             b->mark(x->a, x->move);
         }
+
         /**
          * (4) Back-propagation.
          * return to the root
@@ -321,8 +316,9 @@ namespace opponent {
         while(x != n)
         {
             x->n += total;
-            x->v += x->a == X?
-                winX: winO;
+            x->v += 
+                ((int)~x->a) * winX + 
+                ((int) x->a) * winO;
             b->mark(x->a, x->move);
             x = x->parent;
         }
@@ -353,7 +349,7 @@ namespace opponent {
 
     inline int search(Board * const b) {
         clock_t const time = clock();
-        Node n; n.a = O; n.d = 0;
+        Node n(-1, O, nullptr);
         simulate<true>(b, &n);
         do simulate<false>(b, &n);
         while((clock() - time) < 100000);

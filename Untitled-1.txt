@@ -1,0 +1,55 @@
+
+
+@ script() {
+    s = "Hello World";  
+    puts(s);
+    d = 'i';
+    putc(d);
+    f = [100];
+    puta(f);
+    l = 1;
+    putd(l);
+}
+
+@ script()
+{
+    s = "what";
+    from(i : s) {
+        puts(s[i]);
+    }
+    arr = [100];
+    i = 0;
+    arr[0] = 1;
+    arr[1] = arr[0];
+    as(i < 1) 
+    {
+        if(i == 0) 
+        {
+            i = i + 1;
+            leave;
+            check;
+        } 
+        else 
+        { i = i + 2; }
+
+        match(i) {
+            try 1: {
+                exit;
+            }
+            try 2: {
+                exit;
+            }
+            fail: {
+                exit;
+            }
+        }
+    }
+
+    do 
+    {
+        i = i + 1;
+    } as (i < 1);
+
+    in(x);
+    out(x);
+}
