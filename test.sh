@@ -1,5 +1,0 @@
-echo "/*"
-echo "Author: $1"
-echo "Date: 09/15/202"
-echo "Description: $2"
-echo "*/"
