@@ -22,9 +22,9 @@ namespace opponent {
 
     constexpr double UCB1
         (
-        const double vi, /* The MC value of the node.                      */
-        const double n,  /* The number of simulations run under the parent */
-        const double ni  /* The number of simulations run under the node   */
+        const double vi, /* The value of the node.                         */
+        const double n,  /* The number of visits to the parent             */
+        const double ni  /* The number of visits to the node               */
         )
     {
         return 
