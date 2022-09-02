@@ -142,15 +142,15 @@ namespace opponent {
                 if(a == X) {
                     if(b->hasVictory<X>())
                     { 
-                        total = winX = 
-                            1.0 - d; 
+                        winX = 1.0 - d;
+                        total = 1.0;
                         break; 
                     }
                 } else
                     if(b->hasVictory<O>())
                     { 
-                        total = winO = 
-                            1.0 - d; 
+                        winO = 1.0 - d; 
+                        total = 1.0;
                         break; 
                     }
                 if(b->isFull())
