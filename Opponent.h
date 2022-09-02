@@ -136,20 +136,30 @@ namespace opponent {
          */
         if (x->n < 30)
         {
+            double d = 0.0;
             for(a = ~x->a ;; a = ~a)
             {
                 if(a == X) {
                     if(b->hasVictory<X>())
-                    { winX = 1.0; break; }
+                    { 
+                        total = winX = 
+                            1.0 - d; 
+                        break; 
+                    }
                 } else
                     if(b->hasVictory<O>())
-                    { winO = 1.0; break; }
+                    { 
+                        total = winO = 
+                            1.0 - d; 
+                        break; 
+                    }
                 if(b->isFull())
                 {
                     winX = winO = 0.5;
+                    total = 1.0;
                     break;
                 }
-                total += 1.0;
+                d += 0.01;
                 randMove(b, a, s);
             }
             rollup(b, a, s);
@@ -179,31 +189,32 @@ namespace opponent {
                 ~x->a, x
             );
             b->mark(l->a, l->move);
+            double d = 0.0;
             for(a = x->a ;; a = ~a)
             {
                 if(l->a == X) 
                 {
                     if(b->hasVictory<X>())
                     {
-                        winX += 1.0;
-                        l->v = 1.0;
+                        winX += l->v = 1.0 - d;
+                        total += l->n = 1.0;
                         break;
                     }
                 } else 
                     if(b->hasVictory<O>())
                     {
-                        winO += 1.0;
-                        l->v = 1.0;
+                        winO += l->v = 1.0 - d;
+                        total += l->n = 1.0;
                         break;
                     }
                 if(b->isFull())
                 {
                     winO += 0.5;
-                    winX += 0.5;
-                    l->v = 0.5;
+                    winX += l->v = 0.5;
+                    total += l->n = 1.0;
                     break;
                 }
-                total += l->n = 1.0;
+                d += 0.01;
                 randMove(b, a, s);
             }
             rollup(b, a, s);
