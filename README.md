@@ -3,7 +3,7 @@
 Monte Carlo Tree Search is a versatile search algorithm for making decisions. 
 Its applications range from game-playing to vehicle-piloting.
 # Algorithm Description
-MCTS is an iterative algorithm that repeatedly executes four subroutines.
+MCTS is an iterative algorithm that executes four subroutines until time runs out.
 
 ```
 1. Selection
