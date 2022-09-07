@@ -7,7 +7,7 @@ Its applications range from game-playing to vehicle-piloting.
 </p>
 </br>
 <p>
-MCTS is an iterative algorithm that repeatedly executes four subroutines.
+MCTS is an iterative algorithm that repeatedly executes four subroutines.</br>
   <code>
   1. Selection
   2. Expansion
