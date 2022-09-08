@@ -176,26 +176,26 @@ namespace opponent {
          * rollout, expand
          * the node.
          */
-        if constexpr (INIT)
-            goto expand;
+        if constexpr (!INIT) {
 
-        /**
-         * Don't expand
-         * the current node
-         * until we get 30
-         * good samples.
-         * Collect a sample
-         * now via a single
-         * rollout.
-         */
-        if (x->n < 30)
-        {
-            old_simulate
-            (
-                b, winX, winO, 
-                total, ~x->a
-            );
-            return;
+            /**
+             * Don't expand
+             * the current node
+             * until we get 30
+             * good samples.
+             * Collect a sample
+             * now via a single
+             * rollout.
+             */
+            if (x->n < 30)
+            {
+                old_simulate
+                (
+                    b, winX, winO, 
+                    total, ~x->a
+                );
+                return;
+            }
         }
 
         /**
@@ -209,7 +209,6 @@ namespace opponent {
          * from each of its
          * children.
          */
-        expand:
         uint16_t
         bb = b->legalMoves();
         for (; bb; bb &= bb - 1)
