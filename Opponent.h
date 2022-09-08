@@ -407,7 +407,7 @@ namespace opponent {
         for(Node* x: n->x)
             if (i == x->move)
                 return x;
-        return n;
+        return nullptr;
     } 
 
 
