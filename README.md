@@ -45,8 +45,8 @@ score, count = 0;
 for_each(action a) {
   do_action(a);
   prob = simulate();
-  score += prob
-  count++;
+  score += prob;
+  count += 1;
   undo_action(a);
   x.add_node(a, prob);
 }
