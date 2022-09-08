@@ -42,9 +42,11 @@ each legal action according to the leaf's state.
 score, count = 0;
 for_each(action a) {
   do_action(a);
-  score += simulate();
+  prob = simulate();
+  score += prob
   count++;
   undo_action(a);
+  add_node(a, prob);
 }
 return score, count;
 ```
