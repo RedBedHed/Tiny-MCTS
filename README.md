@@ -42,7 +42,7 @@ each legal action according to the leaf's state.
 
 ```c++
 score, count = 0;
-for_each(action a) {
+for(each action a) {
   do_action(a);
   prob = simulate();
   score += prob;
