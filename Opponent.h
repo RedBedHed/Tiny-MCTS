@@ -293,7 +293,7 @@ namespace opponent {
         Alliance a = ax;
         double   d = 0.0;
 
-        for(a = ax ;; a = ~a)
+        for(;; a = ~a)
         {
             if(n->a == X) 
             {
