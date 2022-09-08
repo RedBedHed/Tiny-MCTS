@@ -22,7 +22,8 @@ like a multi-armed-bandit, exploring less and exploiting more as nodes accrue vi
 Node x = root;
 while(true) {
   if(terminal node x) {
-    value, num = evaluate();
+    value = evaluate();
+    num = 1;
     break;
   }
   if(leaf node x) {
