@@ -398,6 +398,29 @@ namespace opponent {
     }
 
 
+    inline Node* child(Board* b, Node* n, int i) 
+    {
+        if(n->x.empty()) {
+            double winX  = 0,
+                   winO  = 0,
+                   total = 0;
+            expand<true>
+            (
+            b, winX, winO, total, n
+            );
+            n->n += total;
+            n->v += 
+                ((int)~n->a) * winX + 
+                ((int) n->a) * winO;
+            return n;
+        }
+        for(Node* x: n->x)
+            if (i == x->move)
+                return x;
+        return n;
+    } 
+
+
     inline int treeWalk(Node* n, int depth)
     {
         if(n->x.empty())
@@ -421,17 +444,15 @@ namespace opponent {
     }
 
 
-    inline int search(Board * const b) {
+    inline int search(Board * const b, Node*& n, bool f) 
+    {
         clock_t const time = clock();
-        Node n(-1, O, nullptr);
-        select<true>(b, &n);
-        do select<false>(b, &n);
-        while((clock() - time) < 100000);
-        int i = treeWalk(&n, 0);
-        std::cout << "Node Count:" << i << '\n';
-        int move = selectNode(&n)->move;
-        destroyTree(&n);
-        return move;
+        int i = f? 100000: 10000;
+        do select<false>(b, n);
+        while((clock() - time) < i);
+        int l = treeWalk(n, 0);
+        std::cout << "Node Count:" << l << '\n';
+        return (n = selectNode(n))->move;
     }
 }
 

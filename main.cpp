@@ -20,6 +20,9 @@ int main() {
     do {
         cout << "\033[2J\033[H" << flush;
         cout << b;
+        Node n(-1, O, nullptr);
+        Node* r = &n;
+        bool flag = true;
         while(!b.isFull() &&
               !(x = b.hasVictory<X>()) &&
               !(o = b.hasVictory<O>())) {
@@ -32,11 +35,17 @@ int main() {
                 cin.ignore(INT32_MAX,'\n');
             }
             if(i < 1 || i > 9 || b.occupiedSquare(i - 1))
-                continue;
-            b.mark<O>(i - 1);
+                continue;    
+            if(flag) {  
+                b.mark<O>(i - 1);
+                opponent::select<true>(&b, r);
+            } else {
+                r = opponent::child(&b, r, i - 1);
+                b.mark<O>(i - 1);
+            }
             if(b.isFull()) break;
             const long start = clock();
-            const int m = opponent::search(&b);
+            const int m = opponent::search(&b, r, flag);
             b.mark<X>(m);
             const long end = clock() - start;
             cout << "\033[2J\033[H" << flush;
@@ -45,6 +54,7 @@ int main() {
                     "I took %.6f seconds!",
                     ((double)end) / CLOCKS_PER_SEC
             );
+            flag = false;
         }
         cout << '\n'
              << (x? "I win!":
@@ -53,6 +63,7 @@ int main() {
              << "\nplay again? (y/n)\n>>_";
         b.reset();
         hash = 0;
+        opponent::destroyTree(&n);
         while(!(cin >> c)) {
             cin.clear();
             cin.ignore(INT32_MAX,'\n');
