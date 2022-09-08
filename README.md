@@ -72,7 +72,7 @@ while(true) {
 while(not stack.empty()) {
   undo_action(stack.pop());
 }
-reutrn prob;
+return prob;
 ```
 
 ## Back-propagation
