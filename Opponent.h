@@ -20,6 +20,24 @@ namespace opponent {
     using std::vector;
     using std::stack;
 
+    template<bool>
+    void select
+    (Board*, Node*);
+    template<bool>
+    void expand
+    (Board*, double&, double&, double&, Node*);
+    void old_simulate
+    (Board*, double&, double&, double&, Alliance);
+    void new_simulate
+    (Board*, double&, double&, double&, Alliance, Node*);
+    void back_propagate
+    (Board*, double&, double&, double&, Node*, Node*);
+    Node* selectNode
+    (Node*);
+    void randMove
+    (Board*, Alliance&);
+
+
     constexpr double UCB1
         (
         const double vi, /* The value of the node.                         */
@@ -34,197 +52,9 @@ namespace opponent {
             (std::log(n) / ni);
     }
 
-    inline Node* selectNode
-        (
-        Node* const n  /* The parent node.                              */
-        )
-    {
-        /**
-         * Select a
-         * descendant
-         * of the node
-         * n according to
-         * the Upper-
-         * Confidence bound
-         * (applied to trees)
-         * Policy.
-         */
-        Node* s = nullptr;
-        double m = -1;
-        for(Node* const x: n->x)
-        {
-            double h = UCB1
-            (x->v, n->n, x->n);
-            if(h > m)
-            { m = h; s = x; }
-        }
-        return s;
-    }
-
-    inline void rollup
-        (
-        Board* const b, /* The board.                                   */
-        Alliance& a,    /* The starting alliance.                       */
-        stack<int>& s   /* The rollout stack.                           */
-        )
-    {
-        /*
-         * Clean up after a
-         * single rollout.
-         */
-        while (!s.empty())
-        {
-            b->mark
-            (a = ~a, s.top());
-            s.pop();
-        }
-    }
-
-    inline void randMove
-        (
-        Board* const b, /* The board.                                   */
-        Alliance& a,    /* The starting alliance.                       */
-        stack<int>& s   /* The rollout stack.                           */
-        )
-    {
-        /*
-         * Make a random move. 
-         * This is inefficient. 
-         * Do better.
-         */
-        int m;
-        do m = rand() % 9;
-        while
-        (b->occupiedSquare(m));
-        b->mark(a, m);
-        s.push(m);
-    }
 
     template<bool INIT>
-    inline void rollout
-        (
-        Board* const b, /* The board.                                   */
-        double& winX,   /* The win count of x.                          */
-        double& winO,   /* The win count of o.                          */
-        double& total,  /* The total number of simulations.             */
-        Node* const x   /* The leaf tree node selected by tree policy   */
-        )
-    {
-        Alliance    a;
-        Node*       l;
-        stack<int>  s;
-        total = 0;
-
-        /*
-         * If this is an
-         * initialization
-         * rollout, expand
-         * the node.
-         */
-        if constexpr (INIT)
-            goto expand;
-
-        /**
-         * (3) Simulation.
-         * Don't expand
-         * the current node
-         * until we get 30
-         * good samples.
-         * Collect a sample
-         * now via a single
-         * rollout.
-         */
-        if (x->n < 30)
-        {
-            double d = 0.0;
-            for(a = ~x->a ;; a = ~a)
-            {
-                if(a == X) {
-                    if(b->hasVictory<X>())
-                    { 
-                        winX = 1.0 - d;
-                        total = 1.0;
-                        break; 
-                    }
-                } else
-                    if(b->hasVictory<O>())
-                    { 
-                        winO = 1.0 - d; 
-                        total = 1.0;
-                        break; 
-                    }
-                if(b->isFull())
-                {
-                    winX = winO = 0.5;
-                    total = 1.0;
-                    break;
-                }
-                d += 0.01;
-                randMove(b, a, s);
-            }
-            rollup(b, a, s);
-            return;
-        }
-
-        /**
-         * (2) Expansion.
-         * (3) Simulation.
-         * We now have
-         * evidence that this
-         * node is worth
-         * expanding. Expand
-         * the node and rollout
-         * random simulations
-         * from each of its
-         * children.
-         */
-        expand:
-        uint16_t
-        bb = b->legalMoves();
-        for (; bb; bb &= bb - 1)
-        {
-            l = new Node
-            (
-                8 - bit::bitScanFwd(bb), 
-                ~x->a, x
-            );
-            b->mark(l->a, l->move);
-            double d = 0.0;
-            for(a = x->a ;; a = ~a)
-            {
-                if(l->a == X) 
-                {
-                    if(b->hasVictory<X>())
-                    {
-                        winX += l->v = 1.0 - d;
-                        total += l->n = 1.0;
-                        break;
-                    }
-                } else 
-                    if(b->hasVictory<O>())
-                    {
-                        winO += l->v = 1.0 - d;
-                        total += l->n = 1.0;
-                        break;
-                    }
-                if(b->isFull())
-                {
-                    winO += 0.5;
-                    winX += l->v = 0.5;
-                    total += l->n = 1.0;
-                    break;
-                }
-                d += 0.01;
-                randMove(b, a, s);
-            }
-            rollup(b, a, s);
-            b->mark(l->a, l->move);
-            x->x.push_back(l);
-        }
-    }
-
-    template<bool INIT>
-    inline void simulate
+    inline void select
         (
         Board * const b,/* The board.                                   */
         Node  * const n /* The root node.                               */
@@ -244,7 +74,7 @@ namespace opponent {
          */
         if constexpr (INIT)
         {
-            rollout<INIT>
+            expand<INIT>
             (
             b, winX, winO, total, x
             );
@@ -283,7 +113,6 @@ namespace opponent {
                 winX = winO = 0.5; 
                 total = 1.0; break; 
             }
-            
 
             /*
              * If we reach a
@@ -300,7 +129,7 @@ namespace opponent {
                  * the current node
                  * if it is promising.
                  */
-                rollout<INIT>
+                expand<INIT>
                 (b, winX, winO, total, x);
                 break;
             }
@@ -313,12 +142,196 @@ namespace opponent {
              * policy.
              */
             x = selectNode(x);
+
             /**
              * Make the move.
              */
             b->mark(x->a, x->move);
         }
 
+        /**
+         * Update all nodes on the
+         * path back to the root.
+         */
+        back_propagate
+        (b, winX, winO, total, n, x);
+    }
+
+
+    template<bool INIT>
+    inline void expand
+        (
+        Board* const b, /* The board.                                   */
+        double& winX,   /* The win count of x.                          */
+        double& winO,   /* The win count of o.                          */
+        double& total,  /* The total number of simulations.             */
+        Node* const x   /* The leaf tree node selected by tree policy   */
+        )
+    {
+        total = 0;
+
+        /*
+         * If this is an
+         * initialization
+         * rollout, expand
+         * the node.
+         */
+        if constexpr (INIT)
+            goto expand;
+
+        /**
+         * Don't expand
+         * the current node
+         * until we get 30
+         * good samples.
+         * Collect a sample
+         * now via a single
+         * rollout.
+         */
+        if (x->n < 30)
+        {
+            old_simulate
+            (
+                b, winX, winO, 
+                total, ~x->a
+            );
+            return;
+        }
+
+        /**
+         * (2) Expansion.
+         * We now have
+         * evidence that this
+         * node is worth
+         * expanding. Expand
+         * the node and rollout
+         * random simulations
+         * from each of its
+         * children.
+         */
+        expand:
+        uint16_t
+        bb = b->legalMoves();
+        for (; bb; bb &= bb - 1)
+        {
+            Node* n = new Node
+            (
+                8 - bit::bitScanFwd(bb), 
+                ~x->a, x
+            );
+            b->mark(n->a, n->move);
+            new_simulate
+            (   
+                b, winX, winO, 
+                total, x->a, n
+            );
+            b->mark(n->a, n->move);
+            x->x.push_back(n);
+        }
+    }
+
+
+    inline void old_simulate
+        (
+        Board* const bx,  /* The board.                                 */
+        double& winX,     /* The win count of x.                        */
+        double& winO,     /* The win count of o.                        */
+        double& total,    /* The total number of simulations.           */
+        const Alliance ax /* The starting alliance                      */
+        )
+    {
+        Board b = *bx;
+        Alliance a;
+        double d = 0.0;
+        for(a = ax ;; a = ~a)
+        {
+            if(a == X) 
+            {
+                if(b.hasVictory<X>())
+                { 
+                    winX = 1.0 - d;
+                    total = 1.0;
+                    break; 
+                }
+            } else
+                if(b.hasVictory<O>())
+                { 
+                    winO = 1.0 - d; 
+                    total = 1.0;
+                    break; 
+                }
+            if(b.isFull())
+            {
+                winX = winO = 0.5;
+                total = 1.0;
+                break;
+            }
+            d += 0.01;
+            randMove(&b, a);
+        }
+    }
+
+
+    inline void new_simulate
+        (
+        Board* const bx,  /* The board.                                 */
+        double& winX,     /* The win count of x.                        */
+        double& winO,     /* The win count of o.                        */
+        double& total,    /* The total number of simulations.           */
+        const Alliance ax,/* The starting alliance                      */
+        Node* const n
+        )
+    {
+        /**
+         * (3) Simulation.
+         * Rollout a random
+         * line of play to 
+         * the end of the
+         * game.
+         */
+        Alliance a;
+        Board b = *bx;
+        double d = 0.0;
+        for(a = ax ;; a = ~a)
+        {
+            if(n->a == X) 
+            {
+                if(b.hasVictory<X>())
+                {
+                    winX += n->v = 1.0 - d;
+                    total += n->n = 1.0;
+                    break;
+                }
+            } else 
+                if(b.hasVictory<O>())
+                {
+                    winO += n->v = 1.0 - d;
+                    total += n->n = 1.0;
+                    break;
+                }
+            if(b.isFull())
+            {
+                winO += 0.5;
+                winX += n->v = 0.5;
+                total += n->n = 1.0;
+                break;
+            }
+            d += 0.01;
+            randMove(&b, a);
+        }
+    }
+
+
+    inline void back_propagate
+        (
+        Board* const b, /* The board.                                   */
+        double& winX,   /* The win count of x.                          */
+        double& winO,   /* The win count of o.                          */
+        double& total,  /* The total number of simulations.             */
+        Node* const n,  /* The root node                                */
+        Node* x         /* The current node                             */
+        )
+    {
         /**
          * (4) Back-propagation.
          * return to the root
@@ -338,6 +351,54 @@ namespace opponent {
         x->v += winO;
     }
 
+
+    inline Node* selectNode
+        (
+        Node* const n  /* The parent node.                              */
+        )
+    {
+        /**
+         * Select a
+         * descendant
+         * of the node
+         * n according to
+         * the Upper-
+         * Confidence bound
+         * (applied to trees)
+         * Policy.
+         */
+        Node* s = nullptr;
+        double m = -1;
+        for(Node* const x: n->x)
+        {
+            double h = UCB1
+            (x->v, n->n, x->n);
+            if(h > m)
+            { m = h; s = x; }
+        }
+        return s;
+    }
+
+
+    inline void randMove
+        (
+        Board* const b, /* The board.                                   */
+        Alliance& a     /* The starting alliance.                       */
+        )
+    {
+        /*
+         * Make a random move. 
+         * This is inefficient. 
+         * Do better.
+         */
+        int m;
+        do m = rand() % 9;
+        while
+        (b->occupiedSquare(m));
+        b->mark(a, m);
+    }
+
+
     inline int treeWalk(Node* n, int depth)
     {
         if(n->x.empty())
@@ -353,17 +414,19 @@ namespace opponent {
         return c + 1;
     }
 
+
     inline void destroyTree(Node* n)
     {
         for(Node* const x: n->x)
         { destroyTree(x); delete x; }
     }
 
+
     inline int search(Board * const b) {
         clock_t const time = clock();
         Node n(-1, O, nullptr);
-        simulate<true>(b, &n);
-        do simulate<false>(b, &n);
+        select<true>(b, &n);
+        do select<false>(b, &n);
         while((clock() - time) < 100000);
         int i = treeWalk(&n, 0);
         std::cout << "Node Count:" << i << '\n';
