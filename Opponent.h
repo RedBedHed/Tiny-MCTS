@@ -79,7 +79,9 @@ namespace opponent {
             b, winX, winO, total, x
             );
             x->n += total;
-            x->v += winO;
+            x->v += n->v += 
+                ((int)~n->a) * winX + 
+                ((int) n->a) * winO;
             return;
         }
 
@@ -400,19 +402,8 @@ namespace opponent {
 
     inline Node* child(Board* b, Node* n, int i) 
     {
-        if(n->x.empty()) {
-            double winX  = 0,
-                   winO  = 0,
-                   total = 0;
-            expand<true>
-            (
-            b, winX, winO, total, n
-            );
-            n->n += total;
-            n->v += 
-                ((int)~n->a) * winX + 
-                ((int) n->a) * winO;
-        }
+        if(n->x.empty())
+            select<true>(b, n);
         for(Node* x: n->x)
             if (i == x->move)
                 return x;
