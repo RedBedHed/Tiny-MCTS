@@ -19,21 +19,23 @@ account the probability of winning stored in each child. A common policy is UCT,
 like a multi-armed-bandit, exploring less and exploiting more as nodes accrue visits.
 
 ```c++
-Node x = root;
-while(true) {
-  if(terminal node x) {
-    value = evaluate();
-    num = 1;
-    break;
+void select(root) {
+  x = root;
+  while(true) {
+    if(terminal node x) {
+      value = evaluate();
+      num = 1;
+      break;
+    }
+    if(leaf node x) {
+      value, num = expand(x);
+      break;
+    }
+    x = select_child(x);
+    do_action(x.action);
   }
-  if(leaf node x) {
-    value, num = expand(x);
-    break;
-  }
-  x = select_child(x);
-  do_action(x.action);
+  back_propagate(x, prob, num);
 }
-back_propagate(x, prob, num);
 ```
 
 ## Expansion
@@ -41,16 +43,18 @@ Once a leaf node has been selected, MCTS expands it into its children. A new nod
 each legal action according to the leaf's state.
 
 ```c++
-score, count = 0;
-for(each action a) {
-  do_action(a);
-  prob = simulate();
-  score += prob;
-  count += 1;
-  undo_action(a);
-  x.add_node(a, prob);
+float, float expand(x) {
+  score, count = 0;
+  for(each action a) {
+    do_action(a);
+    prob = simulate();
+    score += prob;
+    count += 1;
+    undo_action(a);
+    x.add_node(a, prob);
+  }
+  return score, count;
 }
-return score, count;
 ```
 
 ## Simulation
@@ -62,19 +66,21 @@ playout is usually the probability of winning for either player.
 - 1   means that a player wins.
 
 ```c++
-while(true) {
-  if(terminal state) {
-    prob = evaluate();
-    break;
+float simulate() {
+  while(true) {
+    if(terminal state) {
+      prob = evaluate();
+      break;
+    }
+    a = random_action();
+    do_action(a);
+    stack.push(a);
   }
-  a = random_action();
-  do_action(a);
-  stack.push(a);
+  while(not stack.empty()) {
+    undo_action(stack.pop());
+  }
+  return prob;
 }
-while(not stack.empty()) {
-  undo_action(stack.pop());
-}
-return prob;
 ```
 
 ## Back-propagation
@@ -84,11 +90,13 @@ node owned by the relevant alliance. The simulation count is added to each node 
 alliance.
 
 ```c++
-while(x is not root) {
-  update(x, value, num);
-  undo_action(x.action);
-  x = x.parent;
+void back_propagate(x, root) {
+  while(x is not root) {
+    update(x, value, num);
+    undo_action(x.action);
+    x = x.parent;
+  }
+  update(root, value, num);
 }
-update(root, value, num);
 ```
 
