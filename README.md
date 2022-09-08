@@ -30,6 +30,7 @@ while(true) {
     break;
   }
   x = select_child(x);
+  do_action(x.a);
 }
 back_propagate(x, prob, num);
 ```
@@ -84,6 +85,7 @@ alliance.
 ```c++
 while(x != root) {
   update(x, value, num);
+  undo_action(x.a);
   x = x.parent;
 }
 update(root, value, num);
