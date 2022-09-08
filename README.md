@@ -46,7 +46,7 @@ for_each(action a) {
   score += prob
   count++;
   undo_action(a);
-  add_node(a, prob);
+  x.add_node(a, prob);
 }
 return score, count;
 ```
