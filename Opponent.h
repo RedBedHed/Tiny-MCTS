@@ -412,7 +412,6 @@ namespace opponent {
             n->v += 
                 ((int)~n->a) * winX + 
                 ((int) n->a) * winO;
-            return n;
         }
         for(Node* x: n->x)
             if (i == x->move)
