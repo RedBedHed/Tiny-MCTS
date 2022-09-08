@@ -60,7 +60,7 @@ namespace opponent {
         Node  * const n /* The root node.                               */
         )
     {
-        Node* x   = n;
+        Node*  x     = n;
         double winX  = 0,
                winO  = 0,
                total = 0;
@@ -168,8 +168,6 @@ namespace opponent {
         Node* const x   /* The leaf tree node selected by tree policy   */
         )
     {
-        total = 0;
-
         /*
          * If this is an
          * initialization
@@ -239,10 +237,11 @@ namespace opponent {
         const Alliance ax /* The starting alliance                      */
         )
     {
-        Board b = *bx;
-        Alliance a;
-        double d = 0.0;
-        for(a = ax ;; a = ~a)
+        Board    b = *bx;
+        Alliance a = ax;
+        double   d = 0.0;
+
+        for(;; a = ~a)
         {
             if(a == X) 
             {
@@ -288,9 +287,10 @@ namespace opponent {
          * the end of the
          * game.
          */
-        Alliance a;
-        Board b = *bx;
-        double d = 0.0;
+        Board    b = *bx;
+        Alliance a = ax;
+        double   d = 0.0;
+
         for(a = ax ;; a = ~a)
         {
             if(n->a == X) 
